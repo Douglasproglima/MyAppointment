@@ -2,34 +2,28 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Src\Company\CompanyRepository;
-use App\Src\User\User;
+use App\Src\Service\ServiceRepository;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
-class UserController extends Controller
+class ServiceController extends Controller
 {
     /**
-     * @var User
+     * @var ServiceRepository
      */
-    private $userRepository;
-    /**
-     * @var CompanyRepository
-     */
-    private $companyRepository;
+    private $serviceRepository;
 
     /**
-     * UserController constructor.
-     * @param User $userRepository
-     * @param CompanyRepository $companyRepository
+     * ServiceController constructor.
+     * @param ServiceRepository $serviceRepository
      */
-    public function __construct(User $userRepository,CompanyRepository $companyRepository)
+    public function __construct(ServiceRepository $serviceRepository)
     {
-        $this->userRepository = $userRepository;
-        $this->companyRepository = $companyRepository;
+        $this->serviceRepository = $serviceRepository;
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -37,13 +31,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users  = $this->userRepository->with('companies')->paginate(100);
-        $companies = $this->companyRepository->model->all();
-        $users->map(function($user) use ($companies)  {
-            $user->hasCompany = $user->companies->count() > 0 ? 'yes' : 'no';
-        });
-
-        return view('admin.module.user.index',compact('users'));
+        //
+        $services = $this->serviceRepository->model->paginate(100);
+        return view('admin.module.service.index',compact('services'));
     }
 
     /**
@@ -65,6 +55,11 @@ class UserController extends Controller
     public function store(Request $request)
     {
         //
+        $this->validate($request,[
+           'name_en' => 'string|required|unique:services,name_en'
+        ]);
+        $service = $this->serviceRepository->model->create($request->all());
+        return redirect()->action('Admin\ServiceController@show',$service->id);
     }
 
     /**
@@ -75,7 +70,8 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        $service = $this->serviceRepository->model->find($id);
+        return view('admin.module.service.view',compact('service'));
     }
 
     /**
@@ -99,6 +95,12 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         //
+        $this->validate($request,[
+            'name_en' => 'string|required|unique:services,name_en,'.$id
+        ]);
+        $serviceRepo = $this->serviceRepository->model->find($id);
+        $serviceRepo->update($request->all());
+        return redirect()->back()->with('success','Saved');
     }
 
     /**

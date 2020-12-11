@@ -24,13 +24,13 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = $this->userRepository->all();
+        $users = $this->userRepository->with(['favorites'])->all();
         return response()->json(['data' => $users]);
     }
 
     public function show($id)
     {
-        $user = $this->userRepository->find($id);
+        $user = $this->userRepository->with(['favorites'])->find($id);
         return response()->json(['data' => $user]);
     }
 
