@@ -1,19 +1,23 @@
-@extends('admin.layouts.one-col')
+@extends('admin.layouts.two-col')
 
 @section('breadcrumb')
     <div class="banner">
         <h2>
             <a href="/admin">Home</a>
             <i class="fa fa-angle-right"></i>
-            <span>Users</span>
+            <span>Services</span>
         </h2>
     </div>
 @endsection
 
-@section('middle')
+@section('left')
+    @include('admin.module.service.add')
+@endsection
+
+@section('right')
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h1>Users</h1>
+            <h1>Services</h1>
         </div>
     </div>
     <div class="panel-body" style="padding: 0;">
@@ -21,24 +25,18 @@
             <thead class="bg-blue">
             <tr>
                 <th>Name</th>
-                <th>Email</th>
-                <th>Registered Date</th>
-                <th>Manages Company ? </th>
                 <th></th>
             </tr>
             </thead>
             <tbody>
-            @foreach($users as $user)
+            @foreach($services as $service)
                 <tr class="gradeU">
-                    <td>
-                        <a href="{{ action('Admin\UserController@show',$user->id)}}">{{ $user->name }} </a>
+                    <td >
+                        <span class="title"><a href="{{action('Admin\ServiceController@show',$service->id)}}">{{ $service->name }}</a></span>
                     </td>
-                    <td class="f18">{{ $user->email }}</td>
-                    <td class="f18">{{ $user->created_at->format('d-m-Y') }}</td>
-                    <td class="f18">{{ $user->hasCompany }}</td>
                     <td class="f18">
                         <a href="#" class="red" data-toggle="modal" data-target="#deleteModalBox"
-                           data-link="{{action('Admin\UserController@destroy',$user->id)}}">
+                           data-link="{{action('Admin\ServiceController@destroy',[$service->id])}}">
                             <i class="fa fa-close "></i>
                         </a>
                     </td>
@@ -46,7 +44,7 @@
             @endforeach
             </tbody>
         </table>
-        @include('admin.partials.delete-modal',['info' => 'Delete User'])
+        @include('admin.partials.delete-modal',['info' => 'Remove Service'])
     </div>
 
 @endsection
